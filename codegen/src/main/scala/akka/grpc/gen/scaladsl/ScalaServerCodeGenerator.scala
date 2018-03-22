@@ -14,6 +14,7 @@ trait ScalaServerCodeGenerator extends ScalaCodeGenerator {
     b.setName(s"${service.packageName.replace('.', '/')}/${service.name}Handler.scala")
     b.build
   }
+
 }
 
 object ScalaServerCodeGenerator extends ScalaServerCodeGenerator

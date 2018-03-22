@@ -13,7 +13,7 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import io.grpc.Status
 import io.grpc.testing.integration.messages.{ SimpleRequest, SimpleResponse, StreamingOutputCallRequest, StreamingOutputCallResponse }
-import io.grpc.testing.integration.test.TestService
+import io.grpc.testing.integration.test.{ TestService, TestServiceMarshallers }
 import org.scalatest._
 
 import scala.collection.immutable
@@ -66,7 +66,7 @@ class GrpcInteropSpec extends WordSpec with GrpcInteropTests with Directives {
     def customStatusRoute(testServiceImpl: TestServiceImpl)(implicit mat: Materializer): Route = {
       implicit val ec = mat.executionContext
 
-      import TestService.Serializers.Implicits._
+      import TestServiceMarshallers._
 
       pathPrefix("UnaryCall") {
         entity(as[SimpleRequest]) { req ⇒

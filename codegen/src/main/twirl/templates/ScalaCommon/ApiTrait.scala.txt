@@ -21,45 +21,5 @@ object @{service.name} {
     @for(serializer <- service.serializers) {
     val @serializer.name = @serializer.init
     }
-
-    object Implicits {
-      @for(serializer <- service.serializers) {
-      implicit val @serializer.name = Serializers.@serializer.name
-      }
-
-      import akka.stream.Materializer
-      import akka.grpc.ProtobufSerializer
-      import akka.grpc.scaladsl.GrpcMarshalling
-      import akka.http.scaladsl.unmarshalling.FromRequestUnmarshaller
-
-      implicit def toUnmarshaller[T](implicit serializer: ProtobufSerializer[T], mat: Materializer): FromRequestUnmarshaller[T] = {
-        import scala.concurrent.ExecutionContext
-        import akka.grpc.scaladsl.GrpcMarshalling
-        import akka.http.scaladsl.model.HttpRequest
-        import akka.http.scaladsl.unmarshalling.Unmarshaller
-        Unmarshaller((ec: ExecutionContext) ⇒ (req: HttpRequest) ⇒ GrpcMarshalling.unmarshal(req, serializer, mat))
-      }
-
-
-      implicit def toStreamUnmarshaller[T](implicit serializer: ProtobufSerializer[T], mat: Materializer): FromRequestUnmarshaller[Source[T, NotUsed]] = {
-        import scala.concurrent.ExecutionContext
-        import akka.grpc.scaladsl.GrpcMarshalling
-        import akka.http.scaladsl.model.HttpRequest
-        import akka.http.scaladsl.unmarshalling.Unmarshaller
-        Unmarshaller((ec: ExecutionContext) ⇒ (req: HttpRequest) ⇒ GrpcMarshalling.unmarshalStream(req, serializer, mat))
-      }
-
-      import akka.http.scaladsl.marshalling.ToResponseMarshaller
-
-      implicit def toMarshaller[T](implicit serializer: ProtobufSerializer[T], mat: Materializer): ToResponseMarshaller[T] = {
-        import akka.http.scaladsl.marshalling.Marshaller
-        Marshaller.opaque((response: T) ⇒ GrpcMarshalling.marshal(response, serializer, mat))
-      }
-
-      implicit def toStreamMarshaller[T](implicit serializer: ProtobufSerializer[T], mat: Materializer): ToResponseMarshaller[Source[T, NotUsed]] = {
-        import akka.http.scaladsl.marshalling.Marshaller
-        Marshaller.opaque((response: Source[T, NotUsed]) ⇒ GrpcMarshalling.marshalStream(response, serializer, mat))
-      }
-    }
   }
 }

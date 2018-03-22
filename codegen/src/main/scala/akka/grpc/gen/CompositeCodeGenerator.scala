@@ -1,7 +1,7 @@
 package akka.grpc.gen
 
 import akka.grpc.gen.javadsl.JavaServerCodeGenerator
-import akka.grpc.gen.scaladsl.ScalaBothCodeGenerator
+import akka.grpc.gen.scaladsl.{ ScalaBothCodeGenerator, ScalaMarshallersCodeGenerator }
 import com.google.protobuf.compiler.PluginProtos
 import com.google.protobuf.compiler.PluginProtos.CodeGeneratorResponse
 import protocbridge.Artifact
@@ -17,11 +17,12 @@ object CompositeCodeGenerator extends CodeGenerator {
   override def run(request: PluginProtos.CodeGeneratorRequest): PluginProtos.CodeGeneratorResponse = {
     val javaResult = JavaServerCodeGenerator.run(request)
     val scalaResult = ScalaBothCodeGenerator.run(request)
-    println(javaResult.getFileList.asScala.map(_.getName))
-    println(scalaResult.getFileList.asScala.map(_.getName))
+    val scalaMarshallersResult = ScalaMarshallersCodeGenerator.run(request)
+
     CodeGeneratorResponse.newBuilder()
       .addAllFile(javaResult.getFileList)
       .addAllFile(scalaResult.getFileList)
+      .addAllFile(scalaMarshallersResult.getFileList)
       .build()
   }
 
