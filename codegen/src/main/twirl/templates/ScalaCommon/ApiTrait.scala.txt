@@ -28,13 +28,13 @@ object @{service.name} {
       }
 
       import akka.stream.Materializer
+      import akka.grpc.ProtobufSerializer
+      import akka.grpc.scaladsl.GrpcMarshalling
       import akka.http.scaladsl.unmarshalling.FromRequestUnmarshaller
-      import akka.http.grpc.ProtobufSerializer
-      import akka.http.grpc.scaladsl.GrpcMarshalling
 
       implicit def toUnmarshaller[T](implicit serializer: ProtobufSerializer[T], mat: Materializer): FromRequestUnmarshaller[T] = {
         import scala.concurrent.ExecutionContext
-        import akka.http.grpc.scaladsl.GrpcMarshalling
+        import akka.grpc.scaladsl.GrpcMarshalling
         import akka.http.scaladsl.model.HttpRequest
         import akka.http.scaladsl.unmarshalling.Unmarshaller
         Unmarshaller((ec: ExecutionContext) ⇒ (req: HttpRequest) ⇒ GrpcMarshalling.unmarshal(req, serializer, mat))
@@ -43,7 +43,7 @@ object @{service.name} {
 
       implicit def toStreamUnmarshaller[T](implicit serializer: ProtobufSerializer[T], mat: Materializer): FromRequestUnmarshaller[Source[T, NotUsed]] = {
         import scala.concurrent.ExecutionContext
-        import akka.http.grpc.scaladsl.GrpcMarshalling
+        import akka.grpc.scaladsl.GrpcMarshalling
         import akka.http.scaladsl.model.HttpRequest
         import akka.http.scaladsl.unmarshalling.Unmarshaller
         Unmarshaller((ec: ExecutionContext) ⇒ (req: HttpRequest) ⇒ GrpcMarshalling.unmarshalStream(req, serializer, mat))
