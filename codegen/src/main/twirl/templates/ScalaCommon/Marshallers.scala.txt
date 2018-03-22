@@ -21,15 +21,15 @@ object @{service.name}Marshallers {
   implicit val @serializer.name = @{service.packageName}.@{service.name}.Serializers.@{serializer.name}
   }
 
-  implicit def toUnmarshaller[T](implicit serializer: ProtobufSerializer[T], mat: Materializer): FromRequestUnmarshaller[T] =
+  implicit def unmarshaller[T](implicit serializer: ProtobufSerializer[T], mat: Materializer): FromRequestUnmarshaller[T] =
     Unmarshaller((ec: ExecutionContext) ⇒ (req: HttpRequest) ⇒ GrpcMarshalling.unmarshal(req, serializer, mat))
 
-  implicit def toStreamUnmarshaller[T](implicit serializer: ProtobufSerializer[T], mat: Materializer): FromRequestUnmarshaller[Source[T, NotUsed]] =
+  implicit def toSourceUnmarshaller[T](implicit serializer: ProtobufSerializer[T], mat: Materializer): FromRequestUnmarshaller[Source[T, NotUsed]] =
     Unmarshaller((ec: ExecutionContext) ⇒ (req: HttpRequest) ⇒ GrpcMarshalling.unmarshalStream(req, serializer, mat))
 
-  implicit def toMarshaller[T](implicit serializer: ProtobufSerializer[T], mat: Materializer): ToResponseMarshaller[T] =
+  implicit def marshaller[T](implicit serializer: ProtobufSerializer[T], mat: Materializer): ToResponseMarshaller[T] =
     Marshaller.opaque((response: T) ⇒ GrpcMarshalling.marshal(response, serializer, mat))
 
-  implicit def toStreamMarshaller[T](implicit serializer: ProtobufSerializer[T], mat: Materializer): ToResponseMarshaller[Source[T, NotUsed]] =
+  implicit def fromSourceMarshaller[T](implicit serializer: ProtobufSerializer[T], mat: Materializer): ToResponseMarshaller[Source[T, NotUsed]] =
     Marshaller.opaque((response: Source[T, NotUsed]) ⇒ GrpcMarshalling.marshalStream(response, serializer, mat))
 }
