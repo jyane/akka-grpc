@@ -66,11 +66,7 @@ class GrpcInteropSpec extends WordSpec with GrpcInteropTests with Directives {
     def customStatusRoute(testServiceImpl: TestServiceImpl)(implicit mat: Materializer): Route = {
       implicit val ec = mat.executionContext
 
-      // TODO provide these as easy-to-import implicits:
-      implicit val simpleRequestUnmarshaller: FromRequestUnmarshaller[SimpleRequest] = Unmarshaller((ec: ExecutionContext) ⇒ (req: HttpRequest) ⇒ GrpcMarshalling.unmarshal(req, TestService.Serializers.SimpleRequestSerializer, mat))
-      implicit val streamingOutputCallRequestUnmarshaller: FromRequestUnmarshaller[Source[StreamingOutputCallRequest, NotUsed]] = Unmarshaller((ec: ExecutionContext) ⇒ (req: HttpRequest) ⇒ GrpcMarshalling.unmarshalStream(req, TestService.Serializers.StreamingOutputCallRequestSerializer, mat))
-      implicit val simpleResponseMarshaller: ToResponseMarshaller[SimpleResponse] = Marshaller.opaque((response: SimpleResponse) ⇒ GrpcMarshalling.marshal(response, TestService.Serializers.SimpleResponseSerializer, mat))
-      implicit val streamingOutputCallResponseSerializer = TestService.Serializers.StreamingOutputCallResponseSerializer
+      import TestService.Serializers.Implicits._
 
       pathPrefix("UnaryCall") {
         entity(as[SimpleRequest]) { req ⇒
