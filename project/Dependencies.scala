@@ -59,7 +59,10 @@ object Dependencies {
     Compile.grpcCore,
     Compile.grpcNettyShaded,
     Compile.akkaStream,
-    Compile.akkaHttpCore,
+    // Depend on akka-http and not just akka-http-core because that is used for the generated
+    // marshallers. We might want to make generating marshallers optional, so we can depend
+    // only on akka-http-core when generating marshallers is disabled.
+    Compile.akkaHttp,
     Compile.akkaHttp2Support
   ) ++ testing
 
